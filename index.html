@@ -46,7 +46,7 @@ body{
   font-size:15.5px;line-height:1.55;font-weight:600;
   padding:0 0 70px;-webkit-font-smoothing:antialiased;
 }
-.wrap{max-width:900px;margin:0 auto;padding:0 15px}
+.wrap{padding:0 clamp(15px,3vw,56px)}
 .num{font-variant-numeric:tabular-nums}
 .oculto{display:none!important}
 
@@ -254,6 +254,11 @@ h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(24px,6vw,34p
   50%{box-shadow:0 0 0 6px rgba(255,255,255,.16)}
 }
 
+@media (min-width:1100px){
+  .cajas{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+  .caja{min-height:190px}
+  .caja-nueva{min-height:190px}
+}
 @media (max-width:560px){
   .grid{grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:7px}
   .celda{padding:13px 3px 11px;border-radius:14px}
