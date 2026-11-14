@@ -1,7 +1,8 @@
 /* Service worker mínimo: guarda la app para que abra rápido y sin internet.
-   Los datos SIEMPRE se piden a la red (nunca se cachea el Apps Script). */
+   Los datos SIEMPRE se piden a la red (nunca se cachea la base de datos). */
 
-const CACHE = "ahorro-cj-v4";
+const PREFIJO = "ahorro-cj-";
+const CACHE = PREFIJO + "v5";
 const ARCHIVOS = [
   "./",
   "./index.html",
@@ -24,7 +25,8 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
-      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      /* Solo borra las cachés viejas de ESTA app: el sitio comparte dirección con otras */
+      .then(ks => Promise.all(ks.filter(k => k.startsWith(PREFIJO) && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -33,7 +35,7 @@ self.addEventListener("fetch", e => {
   const url = e.request.url;
 
   // Nunca cachear los datos ni las fuentes de Google
-  if (url.includes("script.google.com") || url.includes("fonts.g")) return;
+  if (url.includes("supabase.co") || url.includes("fonts.g")) return;
   if (e.request.method !== "GET") return;
 
   // La página: red primero, caché si no hay internet

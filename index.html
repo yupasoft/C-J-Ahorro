@@ -287,7 +287,7 @@ h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(24px,6vw,34p
 <div class="wrap">
 
   <div class="aviso oculto" id="avisoLocal">
-    <b>Modo de prueba.</b> Falta conectar el Apps Script: lo que hagas se guarda solo en este dispositivo.
+    <b>Modo de prueba.</b> Falta conectar la base de datos: lo que hagas se guarda solo en este dispositivo.
   </div>
 
   <!-- ═══ PANEL ═══ -->
@@ -342,7 +342,8 @@ h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(24px,6vw,34p
    ①  CONFIGURACIÓN
    ══════════════════════════════════════════════════════════════ */
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbwKEuXlY0VsLKytynH1yXvmLqykbPgPVhWTfkRSi2rrf5yAX9zd_0nvtKUV-sHTs5YX/exec",
+  API_URL: "https://ylwqztypjilecjwywawd.supabase.co",          /* base de datos (Supabase) */
+  API_KEY: "sb_publishable_oHr1AqDbKi_lileKrmkhMg_4T6zYJ7E",    /* llave pública: va solo en la cabecera apikey */
   PIN: "amor2026",
   REFRESCO_SEG: 25
 };
@@ -415,8 +416,16 @@ function marcaSync(clase, texto){
 }
 
 async function llamaAPI(params){
-  const url = CONFIG.API_URL + "?" + new URLSearchParams({pin: CONFIG.PIN, ...params}).toString();
-  const r = await fetch(url, {method:"GET", redirect:"follow"});
+  /* Toda la lógica vive en la función aho_api de la base; aquí solo se le pasa el pedido */
+  const cuerpo = {p_pin: CONFIG.PIN, p_accion: params.action};
+  if(params.caja  !== undefined) cuerpo.p_caja  = params.caja;
+  if(params.i     !== undefined) cuerpo.p_i     = params.i;
+  if(params.monto !== undefined) cuerpo.p_monto = params.monto;
+  const r = await fetch(CONFIG.API_URL + "/rest/v1/rpc/aho_api", {
+    method: "POST",
+    headers: {"apikey": CONFIG.API_KEY, "Content-Type": "application/json"},
+    body: JSON.stringify(cuerpo)
+  });
   if(!r.ok) throw new Error("HTTP " + r.status);
   const j = await r.json();
   if(j.error) throw new Error(j.error);
@@ -453,7 +462,7 @@ async function accion(params, msgError){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ⑤  RETIRO — misma regla que el Apps Script
+   ⑤  RETIRO — misma regla que la función aho_api de la base
    ══════════════════════════════════════════════════════════════ */
 function planRetiro(c, monto){
   const disponible = guardado(c);
