@@ -2,7 +2,7 @@
    Los datos SIEMPRE se piden a la red (nunca se cachea la base de datos). */
 
 const PREFIJO = "ahorro-cj-";
-const CACHE = PREFIJO + "v6";
+const CACHE = PREFIJO + "v7";
 const ARCHIVOS = [
   "./",
   "./index.html",
